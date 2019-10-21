@@ -1,13 +1,16 @@
 #from django.http import HttpResponse
 #02
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.renderers import JSONRenderer
-from rest_framework.parsers import JSONParser
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
+from games.models import GameCategory
 from games.models import Game
+from games.models import Player
+from games.models import PlayerScore
+from games.serializers import GameCategorySerializer
 from games.serializers import GameSerializer
+from games.serializers import PlayerSerializer
+from games.serializers import PlayerScoreSerializer
+from rest_framework import generics
+from rest_framework.response import Response
+from rest_framework.reverse import reverse
 
 # Create your views here.
 # rest_framework.response.Response 로 대체 한다.
@@ -19,6 +22,59 @@ class JSONResponse(HttpResponse):
         super(JSONResponse, self).__init__(content, **kwargs)
 '''
 
+class GameCategoryList(generics.ListCreateAPIView):
+    queryset = GameCategory.objects.all()
+    serializer_class = GameCategorySerializer
+    name = 'gamecategory-list'
+
+class GameCategoryDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = GameCategory.objects.all()
+    serializer_class = GameCategorySerializer
+    name = 'gamecategory-detail'
+
+class GameList(generics.ListCreateAPIView):
+    queryset = Game.objects.all()
+    serializer_class = GameSerializer
+    name = 'game-list'
+
+class GameDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Game.objects.all()
+    serializer_class = GameSerializer
+    name = 'game-detail'
+
+class PlayerList(generics.ListCreateAPIView):
+    queryset = Player.objects.all()
+    serializer_class = PlayerSerializer
+    name = 'player-list'
+
+class PlayerDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Player.objects.all()
+    serializer_class = PlayerSerializer
+    name = 'player-detail'
+
+class PlayerScoreList(generics.ListCreateAPIView):
+    queryset = PlayerScore.objects.all()
+    serializer_class = PlayerScoreSerializer
+    name = 'playerscore-list'
+
+class PlayerScoreDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = PlayerScore.objects.all()
+    serializer_class = PlayerScoreSerializer
+    name = 'playerscore-detail'
+
+# Api의 루트에 대한 엔드포인트 생성
+class ApiRoot(generics.GenericAPIView):
+    name = 'api-root'
+    def get(self, request, *args, **kwargs):
+        return Response({
+            'players': reverse(PlayerList.name, request=request),
+            'game-categories': reverse(GameCategoryList.name, request=request),
+            'games': reverse(GameList.name, request=request),
+            'scores': reverse(PlayerScoreList.name, request=request)
+        })
+
+# 함수기반
+'''
 # 데커레이터
 @csrf_exempt
 @api_view(['GET', 'POST'])
@@ -69,3 +125,4 @@ def game_detail(request, pk): # 기존 게임을 검색, 업데이트, 삭제한
         game.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
         #return HttpResponse(status=status.HTTP_204_NO_CONTENT)
+'''
