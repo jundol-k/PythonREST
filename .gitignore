@@ -12,3 +12,5 @@ Django02/.DS_Store
 Django01/pyvenv.cfg
 Django01/.DS_Store
 .vscode/settings.json
+Django01/Scripts/
+Django02/pyvenv.cfg
