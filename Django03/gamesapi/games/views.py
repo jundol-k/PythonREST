@@ -11,6 +11,10 @@ from games.serializers import PlayerScoreSerializer
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
+from django.contrib.auth.models import User
+from games.serializers import UserSerializer
+from rest_framework import permissions
+from games.permissions import IsOwnerOrReadOnly
 
 # Create your views here.
 # rest_framework.response.Response 로 대체 한다.
@@ -21,6 +25,16 @@ class JSONResponse(HttpResponse):
         kwargs['content_type'] = 'application/json'
         super(JSONResponse, self).__init__(content, **kwargs)
 '''
+
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    name = 'user-list'
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    name = 'user-detail'
 
 class GameCategoryList(generics.ListCreateAPIView):
     queryset = GameCategory.objects.all()
@@ -36,11 +50,16 @@ class GameList(generics.ListCreateAPIView):
     queryset = Game.objects.all()
     serializer_class = GameSerializer
     name = 'game-list'
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+    def perform_create(self, serializer):
+        # 요청으로 받은 사용자로 소유자를 설정하기 위해 create 메소드에게 추가적인 owner 필드를 전달한다.
+        serializer.save(owner=self.request.user)
 
 class GameDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Game.objects.all()
     serializer_class = GameSerializer
     name = 'game-detail'
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
 
 class PlayerList(generics.ListCreateAPIView):
     queryset = Player.objects.all()
@@ -70,7 +89,8 @@ class ApiRoot(generics.GenericAPIView):
             'players': reverse(PlayerList.name, request=request),
             'game-categories': reverse(GameCategoryList.name, request=request),
             'games': reverse(GameList.name, request=request),
-            'scores': reverse(PlayerScoreList.name, request=request)
+            'scores': reverse(PlayerScoreList.name, request=request),
+            'users': reverse(UserList.name, request=request),
         })
 
 # 함수기반

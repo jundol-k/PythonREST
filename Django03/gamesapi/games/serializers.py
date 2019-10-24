@@ -3,6 +3,7 @@ from games.models import GameCategory
 from games.models import Game
 from games.models import Player
 from games.models import PlayerScore
+from django.contrib.auth.models import User
 
 # 01
 '''
@@ -25,6 +26,19 @@ class GameSerializer(serializers.Serializer):
         instance.save()
         return instance
 '''
+#03
+class UserGameSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Game
+        fields = ('url', 'name')
+
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    games = UserGameSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = User
+        fields = ('url', 'pk', 'username', 'games')
+
 #02
 class GameCategorySerializer(serializers.HyperlinkedModelSerializer):
     games = serializers.HyperlinkedRelatedField(
@@ -36,13 +50,18 @@ class GameCategorySerializer(serializers.HyperlinkedModelSerializer):
         model = GameCategory
         fields = ('url', 'pk', 'name', 'games')
 #02
+#03
 class GameSerializer(serializers.HyperlinkedModelSerializer):
+    # 소유자 사용자 이름만 표시하려고한다 (읽기 전용)
+    owner = serializers.ReadOnlyField(source='owner.username')
     # We want to display the game cagory's name instead of the id
     game_category = serializers.SlugRelatedField(queryset = GameCategory.objects.all(), slug_field='name')
 
     class Meta:
         model = Game
+        depth = 4
         fields = ('url',
+                  'owner',
                   'name',
                   'release_date',
                   'game_category',
