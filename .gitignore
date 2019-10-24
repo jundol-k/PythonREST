@@ -22,3 +22,10 @@ Django03/gamesapi/games/migrations/
 Django03/gamesapi/gamesapi/__pycache__/
 Django03/Lib/
 Django03/Scripts/
+Django04/pyvenv.cfg
+Django04/gamesapi/manage.py
+Django04/gamesapi/games/__pycache__/
+Django04/gamesapi/games/migrations/
+Django04/gamesapi/gamesapi/__pycache__/
+Django04/Lib/
+Django04/Scripts/
