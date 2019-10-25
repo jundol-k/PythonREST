@@ -29,3 +29,4 @@ Django04/gamesapi/games/migrations/
 Django04/gamesapi/gamesapi/__pycache__/
 Django04/Lib/
 Django04/Scripts/
+Django04/man/man1/nosetests.1

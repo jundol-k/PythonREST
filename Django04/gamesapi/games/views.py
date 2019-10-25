@@ -15,6 +15,10 @@ from django.contrib.auth.models import User
 from games.serializers import UserSerializer
 from rest_framework import permissions
 from games.permissions import IsOwnerOrReadOnly
+from rest_framework.throttling import ScopedRateThrottle
+from rest_framework import filters
+from django_filters.rest_framework import FilterSet
+from django_filters import NumberFilter, DateTimeFilter, AllValuesFilter
 
 # Create your views here.
 # rest_framework.response.Response 로 대체 한다.
@@ -40,17 +44,29 @@ class GameCategoryList(generics.ListCreateAPIView):
     queryset = GameCategory.objects.all()
     serializer_class = GameCategorySerializer
     name = 'gamecategory-list'
+    throttle_scope = 'game-categories'
+    throttle_classes = (ScopedRateThrottle,)
+    #filter_fields = ('name',)
+    filter_backends = [filters.SearchFilter]
+    search_fields = ('^name',)
+    ordering_fields = ('name',)
 
 class GameCategoryDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = GameCategory.objects.all()
     serializer_class = GameCategorySerializer
     name = 'gamecategory-detail'
+    throttle_scope = 'game-categories'
+    throttle_classes = (ScopedRateThrottle,)
 
 class GameList(generics.ListCreateAPIView):
     queryset = Game.objects.all()
     serializer_class = GameSerializer
     name = 'game-list'
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+    #filter_fields = ('name', 'game_category', 'release_date', 'played', 'owner',)
+    filter_backends = [filters.SearchFilter]
+    search_fields = ('^name',)
+    ordering_fields = ('name', 'release_date',)
     def perform_create(self, serializer):
         # 요청으로 받은 사용자로 소유자를 설정하기 위해 create 메소드에게 추가적인 owner 필드를 전달한다.
         serializer.save(owner=self.request.user)
@@ -65,21 +81,40 @@ class PlayerList(generics.ListCreateAPIView):
     queryset = Player.objects.all()
     serializer_class = PlayerSerializer
     name = 'player-list'
+    #filter_fields = ('name', 'gender',)
+    filter_backends = [filters.SearchFilter]
+    search_fields = ('^name',)
+    ordering_fields = ('name',)
 
 class PlayerDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Player.objects.all()
     serializer_class = PlayerSerializer
     name = 'player-detail'
 
+class PlayerScoreFilter(FilterSet):
+    min_score = NumberFilter(field_name='score', lookup_expr='gte')
+    max_score = NumberFilter(field_name='score', lookup_expr='lte')
+    from_score_date = DateTimeFilter(field_name='score_date', lookup_expr='gte')
+    to_score_date = DateTimeFilter(field_name='score_date', lookup_expr='lte')
+    player_name = AllValuesFilter(field_name='player__name')
+    game_name = AllValuesFilter(field_name='game__name')
+
+    class Meta:
+        model = PlayerScore
+        fields = ('score', 'from_score_date', 'to_score_date', 'min_score', 'max_score','player_name','game_name')
+
 class PlayerScoreList(generics.ListCreateAPIView):
     queryset = PlayerScore.objects.all()
     serializer_class = PlayerScoreSerializer
     name = 'playerscore-list'
+    filterset_class = PlayerScoreFilter
+    ordering_fields = ('score', 'score_date',)
 
 class PlayerScoreDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = PlayerScore.objects.all()
     serializer_class = PlayerScoreSerializer
     name = 'playerscore-detail'
+
 
 # Api의 루트에 대한 엔드포인트 생성
 class ApiRoot(generics.GenericAPIView):

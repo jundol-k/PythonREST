@@ -31,10 +31,25 @@ REST_FRAMEWORK = {
     #'DEFAULT_PAGINATION_CLASS':'rest_framework.pagination.LimitOffsetPagination',
     'DEFAULT_PAGINATION_CLASS':'games.pagination.LimitOffsetPaginationWithMaxLimit',
     'PAGE_SIZE':5,
+    'DEFAULT_FILTER_BACKENDS': (
+        #'rest_framework.filters.DjangoFilterBackend', 더이상 사용 불가능함.
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ),
     'DEFAULT_AUTHENTICATION_CLASSES':(
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-    )
+    ),
+    'DEFAULT_THROTTLE_CLASSES':(
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ),
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '1000/hour',
+        'user': '1000/hour',
+        'game-categories': '1000/hour',
+    }
 }
 
 
@@ -51,6 +66,9 @@ INSTALLED_APPS = [
     'rest_framework',
     # Games 애플리케이션
     'games.apps.GamesConfig',
+    # 크리스피 양식
+    'crispy_forms',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
