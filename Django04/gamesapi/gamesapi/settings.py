@@ -31,12 +31,13 @@ REST_FRAMEWORK = {
     #'DEFAULT_PAGINATION_CLASS':'rest_framework.pagination.LimitOffsetPagination',
     'DEFAULT_PAGINATION_CLASS':'games.pagination.LimitOffsetPaginationWithMaxLimit',
     'PAGE_SIZE':5,
-    'DEFAULT_FILTER_BACKENDS': (
-        #'rest_framework.filters.DjangoFilterBackend', 더이상 사용 불가능함.
-        'django_filters.rest_framework.DjangoFilterBackend',
-        'rest_framework.filters.SearchFilter',
-        'rest_framework.filters.OrderingFilter',
-    ),
+    # 'DEFAULT_FILTER_BACKENDS': (
+    #     #'rest_framework.filters.DjangoFilterBackend', 더이상 사용 불가능함.
+    #     'django_filters.rest_framework.DjangoFilterBackend',
+    #     'rest_framework.filters.SearchFilter',
+    #     'rest_framework.filters.OrderingFilter',
+    # ),
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_AUTHENTICATION_CLASSES':(
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
@@ -69,6 +70,8 @@ INSTALLED_APPS = [
     # 크리스피 양식
     'crispy_forms',
     'django_filters',
+    # 장고 nose
+    'django_nose',
 ]
 
 MIDDLEWARE = [
@@ -154,3 +157,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# nose를 사용해 모든 테스트를 실행할 것이다.
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+# nose가 게임 앱에 대한 커버리지를 측정할 것이다.
+NOSE_ARGS = [
+    '--with-coverage',
+    '--cover-erase',
+    '--cover-inclusive',
+    '--cover-package=games',
+]

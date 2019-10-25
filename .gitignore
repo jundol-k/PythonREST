@@ -30,3 +30,5 @@ Django04/gamesapi/gamesapi/__pycache__/
 Django04/Lib/
 Django04/Scripts/
 Django04/man/man1/nosetests.1
+Django04/gamesapi/__pycache__/manage.cpython-37.pyc
+Django04/gamesapi/.coverage
