@@ -25,7 +25,7 @@ SECRET_KEY = '_u$ha1l-e!d8_0inje9rp86adwi7es+n5az$mxn#$1@%pd1di7'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 
 REST_FRAMEWORK = {
     #'DEFAULT_PAGINATION_CLASS':'rest_framework.pagination.LimitOffsetPagination',
