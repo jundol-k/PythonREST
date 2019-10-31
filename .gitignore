@@ -33,3 +33,7 @@ Django04/man/man1/nosetests.1
 Django04/gamesapi/__pycache__/manage.cpython-37.pyc
 Django04/gamesapi/.coverage
 Django04/gamesapi/htmlcov/
+Flask01/Lib/
+Flask01/Scripts/
+Flask01/api/__pycache__/
+Flask01/pyvenv.cfg
